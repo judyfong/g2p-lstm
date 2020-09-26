@@ -1,0 +1,33 @@
+#!/bin/bash
+
+##########################################################################
+#
+#  Calls fairseq-interactive with a g2p model for pronunciation of Icelandic
+#  as traditionally spoken in the south/south east. See Readme.md for fairseq setup instructions.
+#
+#  The characters in the input words to transcribe have to be separated by space:
+#    'h l a u p a'
+#
+#  Usage example: 
+#    $cat wordlist.txt | ./transcribe_ice_south wordlist_g2p_south.out wordlist_g2p_south.tsv
+#
+###########################################################################
+
+# complete output file
+OUT="$1" 
+# results of the g2p
+TSV="$2"
+fairseq-interactive \
+    "data-bin/south" \
+    --source-lang="south.graphemes" \
+    --target-lang="south.phonemes" \
+    --path="checkpoints/south-256-.3-s-s/checkpoint_last.pt" \
+    --seed=1917 \
+    --beam=5 \
+    --no-progress-bar \
+     > "${OUT}"
+        # Extracts the predictions into a TSV file.
+        paste \
+            <(cat "${OUT}" | grep '^S-' | cut -f2) \
+            <(cat "${OUT}" | grep '^H-' | cut -f3) \
+            > "${TSV}"

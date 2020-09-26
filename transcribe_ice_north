@@ -1,0 +1,34 @@
+#!/bin/bash
+
+##########################################################################
+#
+#  Calls fairseq-interactive with a g2p model for pronunciation of Icelandic
+#  as traditionally spoken in the north. See Readme.md for fairseq setup instructions.
+#
+#  The characters in the input words to transcribe have to be separated by space:
+#    'h l a u p a'
+#
+#  Usage example: 
+#    $cat wordlist.txt | ./transcribe_ice_north wordlist_g2p_north.out wordlist_g2p_north.tsv
+#
+###########################################################################
+
+# complete output file
+OUT="$1" 
+# results of the g2p
+TSV="$2"
+
+fairseq-interactive \
+    "data-bin/north" \
+    --source-lang="north.graphemes" \
+    --target-lang="north.phonemes" \
+    --path="checkpoints/north-256-.3-s-s/checkpoint_last.pt" \
+    --seed=1917 \
+    --beam=5 \
+    --no-progress-bar \
+     > "${OUT}"
+        # Extracts the predictions into a TSV file.
+        paste \
+            <(cat "${OUT}" | grep '^S-' | cut -f2) \
+            <(cat "${OUT}" | grep '^H-' | cut -f3) \
+            > "${TSV}"
