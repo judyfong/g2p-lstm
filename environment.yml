@@ -6,5 +6,6 @@ channels:
 dependencies:
  - python=3.7.4
  - pytorch=1.2.0
+ - pip
  - pip:
    - fairseq==0.8.0
